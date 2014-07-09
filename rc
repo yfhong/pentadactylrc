@@ -1,0 +1,525 @@
+"" {{{ Mapping
+"" scroll more
+nmap -builtin j 10j
+nmap -builtin k 10k
+
+"" swap d/D
+nmap -builtin d D
+nmap -builtin D d
+nmap -builtin gd :js config.tabbrowser.removeTab(tabs.getTab())<CR>
+
+"" swap y/Y
+"nmap -builtin y Y
+"nmap -builtin Y y
+
+"" swap p/P
+nmap -builtin p P
+nmap -builtin P p
+
+"" J/K move left/right
+"nmap -builtin J h
+"nmap -builtin K l
+
+"" w/e switch tabs
+nmap -builtin w <C-p>
+nmap -builtin e <C-n>
+
+"" back/forward
+nmap -builtin h <C-o>
+nmap -builtin l <C-i>
+
+"" left/right
+nmap -builtin <C-o> 10<Right>
+nmap -builtin <C-i> 10<Left>
+
+"" prev selected tab
+nmap -builtin x <C-^>
+
+"" <M-i> focus on input
+"nmap -builtin <M-i> gi
+
+"" U list closed tabs
+nmap -builtin U :undo<Space>
+
+"" toggle menubar
+nmap -builtin gm :set guioptions!=m<CR>
+
+"" viewsource in new tab
+nmap -builtin gf :tab viewsource<CR>
+
+"" swap full zoom and text zoom mapping
+nmap -builtin zi ZI
+nmap -builtin zm ZM
+nmap -builtin zo ZO
+nmap -builtin zr ZR
+nmap -builtin zz zZ
+nmap -builtin ZI zi
+nmap -builtin ZM zm
+nmap -builtin ZO zo
+nmap -builtin ZR zr
+nmap -builtin zZ zz
+
+"" open addons manager
+nmap -builtin ,a :dialog addons<CR>
+
+"" rehash
+nmap -builtin ,R :rehash<CR>
+
+"" private mode
+nmap -builtin ,p :set private!<CR>
+
+"" fullscreen
+nmap -builtin ,F :set fullscreen!<CR>
+
+"" display download
+nmap -builtin ,d :downloads<CR>
+
+"" about:config
+nmap -builtin ,c :tabopen about:config<CR>
+
+"" auto add -tags option when adding bookmark
+nmap -builtin a a<Space>-tags<Space>
+
+"" tabgroup
+if config.OS.isMacOSX
+nmap -builtin ,e <S-M-e>
+else
+nmap -builtin ,e <S-C-e>
+end
+
+"" jumping at hint mode, see http://code.google.com/p/dactyl/issues/detail?id=158
+"map -modes hints j     -ex normal! 10j
+"map -modes hints k     -ex normal! 10k
+map -modes hints <C-f> -ex normal! <C-f>
+map -modes hints <C-b> -ex normal! <C-b>
+"map -modes hints gg    -ex normal! gg
+"map -modes hints G     -ex normal! G
+
+"" focus on main frame
+nmap -builtin gw ;F1<CR>
+
+"" }}}
+
+"" {{{ Searching
+"" from http://www.slimeden.com/2011/03/firefox/pentadactyl
+":map t -js content.getSelection().toString()!=""?dactyl.execute(":tabopen "+ content.getSelection()):CommandExMode().open("tabopen ")
+":map o -js content.getSelection().toString()!=""?dactyl.execute(":open "+ content.getSelection()):CommandExMode().open("open ")
+command -nargs=* -complete=search search execute 'tabopen <args> ' + content.getSelection().toString()
+map s :search<Space>
+command -nargs=? -complete=search switchSearch execute 'open <args> ' + (buffer.lastInputField?buffer.lastInputField.value:'')
+map S gi<ESC> :switchSearch<Space>
+command -nargs=* siteSearch execute "tabopen <args> site:" + window.content.location.hostname
+
+set defsearch=g
+"" }}}
+
+"" {{{ Option
+"" ]]/[[ turn next/previous page
+set nextpattern&
+set nextpattern^='[下后]\s*一?\s*[页张个篇章頁]','\bolder\s*posts\b','^→$'
+set previouspattern&
+set previouspattern^='[上前]\s*一?\s*[页张个篇章頁]','\bnewer\s*posts\b','^←$'
+
+"" do not display right scrollbar and commandline
+"set guioptions+=n
+set guioptions=sn
+
+"" open things at new tab
+set newtab=all
+
+"" dont show link at status line
+set showstatuslinks=
+
+"" highlight search
+"set hlfind
+
+"" complete search engine suguest
+set complete=location,suggestion
+
+"" allow popups popup
+"set popups=tab,resized
+
+"" home row as hintkeys
+"set hintkeys=asdfg;lkjh
+"set hintkeys="4;/.123"
+
+"" only follow hints when press enter
+"set followhints=1
+
+"" show link when hover links
+"set showstatuslinks=command
+
+"" disable annoying auto focus
+set strictfocus^=tao123.com:despotic
+
+"" disable smooth scroll
+set scrollsteps=1
+set scrolltime=0
+
+set maxitems=10
+
+"" press tab to begin completion of :open :tabopen cmd
+"set autocomplete=!/ex/(tab)?open,.?
+
+"" gerrit
+set passkeys+='^https?://(review|scm|gerrit)\..*/#/':'/?ojksOur',ga,gc,gd,gi,gm,go,gs,gw
+"" }}}
+
+"" {{{ Command
+"" smart reload
+command smartReload -js <<EOF
+if (buffer.URL.spec.contains('#')) {
+    dactyl.execute("reload");
+} else {
+    dactyl.open(buffer.URL.spec);
+}
+EOF
+nmap -builtin r :smartReload<CR>
+
+"" flush browser dns
+command flushdns set! network.dnsCacheExpiration=0 | set! network.dnsCacheExpiration&
+
+"" use vlc to play hls video
+command! hls -nargs=? -count -js <<EOF
+let hls = function(url){
+    let m3u8 = youku(url);
+    if (m3u8) {
+        io.run('vlc', [m3u8]);
+    }
+};
+let youku = function(url) {
+    let m = url.match('v_show/id_(.*)\.html');
+    if (m) {
+        let id = m[1];
+        let format = 'hd2';
+        if (count) {
+            format = ['', 'hd2', 'mp4', 'flv'][count];
+        }
+        return 'http://v.youku.com/player/getRealM3U8/vid/' + id + '/type/' + format + '/v.m3u8';
+    }
+    return null;
+};
+let url = args.length ? args : buffer.URL.spec;
+hls(url);
+EOF
+group -locations http://v.youku.com/v_show/* hls
+nmap -builtin -ex ge <count>hls
+group user
+
+"" use vlc to play youtube video
+command! youtube -nargs=? -count -js <<EOF
+let url = args.length ? args : buffer.URL.spec;
+let format = '';
+if (count) {
+    format = ['', '&fmt=37', '&fmt=22', '&fmt=18'][count];
+}
+io.run('vlc', ['--socks', '127.0.0.1:7070', url+format]);
+EOF
+group -locations http*://www.youtube.com/watch* youtube
+nmap -builtin -ex ge <count>youtube
+group user
+
+"" open chdbits torrent
+command! chdbits -js <<EOF
+let chdbits = function (url) {
+    let torrent = 'http://chdbits.org/download.php?id=' + url.match(/\?id=([0-9]+)/)[1];
+    let tmpFile = io.createTempFile('torrent');
+    buffer.saveURI(util.newURI(torrent), tmpFile, function() {
+        tmpFile.launch();
+    });
+}
+chdbits(buffer.URL.spec);
+EOF
+group -locations http://chdbits.org/details.php?id=* chdbits
+nmap -builtin ge :chdbits<CR>
+group user
+
+"" open using external browser
+command! openEx -nargs=? -js <<EOF
+let url = args.length ? args : buffer.URL.spec;
+if (config.OS.isMacOSX) {
+    io.system("open -a Safari '" + url + "'");
+} else {
+    dactyl.execute("tabopen " + url);
+}
+EOF
+nmap -builtin ge :openEx<CR>
+
+"" kanged from https://github.com/blueyed/dotfiles/blob/master/pentadactylrc
+"" Open current location via Coral CDN
+"" String.replace is a workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=633830
+command coralcdn -js dactyl.open( String.replace(buffer.URL.spec, /(\.\w{2,4})\//, "$1.nyud.net/") )
+nmap -builtin gp :coralcdn<CR>
+
+command gohttps -js <<EOF
+if (buffer.URL.spec.startsWith('http://')) {
+    dactyl.open(String.replace(buffer.URL.spec, /^http/i, 'https'));
+} else if (buffer.URL.spec.startsWith('https://')) {
+    dactyl.open(String.replace(buffer.URL.spec, /^https/i, 'http'));
+}
+EOF
+nmap -builtin gs :gohttps<CR>
+
+"" display calendar
+"command cal -js dactyl.echo(<datepicker type="grid" xmlns={XUL}/>)
+
+"" google translate
+command trans -js <<EOF
+let getParameterByName = function(url, name) {
+    let name = name.replace(/[\[]/, '\\\[').replace(/[\]]/, '\\\]');
+    let regexS = '[\\?&]' + name + '=([^&#]*)';
+    let regex = new RegExp(regexS);
+    let results = regex.exec(url);
+    if (results == null)
+        return '';
+    else
+        return decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
+if (buffer.URL.spec.startsWith('http://translate.google.com/')) {
+    dactyl.open(getParameterByName(buffer.URL.spec, 'u'));
+} else {
+    dactyl.open('http://translate.google.com/translate?hl=en&sl=auto&tl=en&u=' + encodeURIComponent(buffer.URL.spec));
+}
+EOF
+nmap -builtin ,t :trans<CR>
+
+"" jump to a command, mapping or option source definition, from https://gist.github.com/3331062
+command jumptodef,jd -literal=1 -nargs=1 -complete help -js <<EOF
+let sourceLocation = function(str) {
+    let mapping = function(s) {
+        let [, mc, key] = /(?:(.)_)?(.*)/.exec(s);
+        return mappings.get(mc ? modes.modeChars[mc] : modes.NORMAL, key) ||
+            dactyl.echoerr("Bad bad: " + s);
+    };
+    if (isArray(str))
+        str = str[0];
+    let frame = ((str[0] === ":") ? commands.get(str.substr(1)) :
+        /'.*?'/.test(str) ? options.get(str.slice(1,-1)) :
+        mapping(str)).definedAt;
+    return { url: util.fixURI(frame.filename), line: frame.lineNumber };
+};
+//buffer.viewSource(sourceLocation(args[0]));
+let loc = sourceLocation(args[0]);
+window.openDialog("chrome://global/content/viewSource.xul",
+    "_blank", "all,dialog=no",
+    loc.url, null, null, loc.line);
+EOF
+
+"" delete duplicate tabs
+command -description "Delete duplicate tabs" tabcloseduplicates,tabclosed -js <<EOF
+let seen = {}, vtabs = tabs.visibleTabs, i = vtabs.length;
+while (i--) {
+    let loc = vtabs[i].linkedBrowser.contentDocument.location.href || "";
+    if (Object.prototype.hasOwnProperty.call(seen, loc)) {
+        config.tabbrowser.removeTab(vtabs[i]);
+    } else {
+        seen[loc] = true;
+    }
+}
+EOF
+nmap -builtin ,D :tabcloseduplicates<CR>
+
+"" ramback kanged from https://addons.mozilla.org/en-US/firefox/addon/ramback/
+command! ramback -js <<EOF
+let observerService = Components.classes["@mozilla.org/observer-service;1"].getService(Components.interfaces.nsIObserverService);
+observerService.notifyObservers(null, "memory-pressure", "heap-minimize");
+observerService.notifyObservers(null, "memory-pressure", "heap-minimize");
+observerService.notifyObservers(null, "memory-pressure", "heap-minimize");
+observerService.notifyObservers(null, "dump-mem-stats", "clean up, pig!");
+EOF
+
+"" toggle auto load plugins
+command! pluginstoggle -description "Allow/unset plugins permission for current site" -js <<EOF
+if (services.permissions.testPermission(buffer.uri, "plugins") !== Sanitizer.PERMS["allow"]) {
+    dactyl.echo("ALLOW plugins permission for " + buffer.uri.host);
+    services.permissions.add(buffer.uri, "plugins", Sanitizer.PERMS["allow"]);
+} else {
+    dactyl.echo("UNSET plugins permission for " + buffer.uri.host);
+    services.permissions.remove(buffer.uri.host, "plugins");
+}
+EOF
+
+"" Unload current tab using BarTab
+command! unload -description "Unload current tab" -js gBrowser.BarTabHandler.unloadTab(gBrowser.mCurrentTab)
+
+"" Manage proxy.pac
+command! reloadPAC,rp -js Components.classes['@mozilla.org/network/protocol-proxy-service;1'].getService().reloadPAC();
+js <<EOF
+group.commands.add(["pac"],
+    "Add domain to proxy.pac",
+    function (args) {
+        function addDomain(pac, domain) {
+            pac = pac.replace('//MARK1', '|| dnsDomainIs(host, "' + domain + "\")\n        //MARK1");
+            return pac.replace('//MARK2', '|| dnsDomainIs(host, ".' + domain + "\")\n    //MARK2");
+        }
+        let hostname = args.length ? args : util.subdomains(window.content.location.hostname)[0];
+        let pacfile = io.File(IO.runtimePath + '/proxy.pac');
+        let pac = pacfile.read();
+        pac = addDomain(pac, hostname);
+        pacfile.write(pac);
+        Components.classes['@mozilla.org/network/protocol-proxy-service;1'].getService().reloadPAC();
+    }, {
+        argCount: "?",
+        completer: function (context) {
+            modules.completion.visibleHosts(context);
+        },
+    }, true);
+EOF
+
+"" Change proxy type
+js <<EOF
+group.commands.add(["proxytype", "pt"],
+    "Change proxy type",
+    function (args) {
+        let types = [
+            "Direct",
+            "Manual",
+            "Proxy.pac",
+            "",
+            "Auto",
+            "System"
+        ];
+        let type = 5;
+        if (args.length) {
+            type = parseInt(args);
+        } else {
+            let cur_type = prefs.get("network.proxy.type");
+            if (cur_type === 2) {
+                type = 1;
+            } else if (cur_type === 1) {
+                type = 2;
+            } else {
+                type = cur_type;
+            }
+        }
+        dactyl.echo("Proxy type: " + types[type]);
+        prefs.set("network.proxy.type", type);
+    }, {
+        argCount: "?",
+        completer: function (context) {
+            context.title = "Proxy type";
+            context.completions = [
+                ["0", "Direct"],
+                ["1", "Manual"],
+                ["2", "Proxy.pac"],
+                ["4", "Auto"],
+                ["5", "System"]
+            ];
+        }
+    }, true);
+EOF
+
+"" }}}
+
+"" {{{ AutoCMD
+"" use google to get lwn subscription link
+autocmd -javascript PageLoad 'https://lwn.net/Articles/*' <<EOF
+if (doc.title.match(/subscription/i)) {
+    let title = doc.getElementsByClassName("ArticleText")[0].getElementsByTagName("a")[0].innerHTML;
+    dactyl.open('gl site:lwn.net/SubscriberLink "' + title + '"');
+}
+EOF
+"" }}}
+
+"" {{{ Misc
+"" ~ as pwd
+silent cd ~
+
+"" plugins
+set loadplugins='\.(css|js|penta)$'
+
+"" try to guess if param of :open is a url, and add buffer to :open/tabopen complition
+js <<EOF
+let isURL = function (url) {
+    if (typeof url !== "string")
+        return false;
+    if (url.startsWith("google "))
+        return false;
+    if (url.startsWith("~/"))
+        return true;
+    let m = url.match(/^(?:[^.:\/ ]+\.)+([A-Za-z]+)($|\/)/);
+    return (!m || m[1].match(/^(?:com|net|org|name|edu|gov|au|tw|cz|cn|us|me|info|co|jp|ly|gd|gl|de|fm|io|im)$/));
+};
+overlay.overlayObject(dactyl, {
+    open: function open(urls, params, force) {
+        if (typeof urls === "string") {
+            let matches = urls.match(/^(\d+): /);
+            if (matches) {
+                tabs.switchTo(urls, true);
+                return;
+            }
+        }
+        if (!isURL(urls)) {
+            arguments[0] = options["defsearch"] + " " + arguments[0];
+        }
+        open.superapply(this, arguments);
+    }
+});
+completion.addUrlCompleter("buffer", "Open Tabs", completion.buffer);
+options["complete"].splice(0, 0, "buffer");
+EOF
+
+"" custom hint
+js <<EOF
+let selectors = ["a[target='_blank']", "a[target='_self']", "a[href^='#!topic/']", "div.links_main"];
+hints.addMode("g", "Follow specfic hint", function (elem) buffer.followLink(elem), null, selectors);
+hints.addMode("G", "Follow specfic hint in a background tab", function (elem) buffer.followLink(elem, dactyl.NEW_BACKGROUND_TAB), null, selectors);
+EOF
+group -locations www.google.com,groups.google.com,duckduckgo.com customHint
+nmap -builtin f ;G
+nmap -builtin F g;G
+group -locations groups.google.com customHintGoogleGroups
+nmap -builtin f ;g
+group user
+
+"" google docs viewer
+js <<EOF
+hints.addMode("d", "Open link using google docs", function (elem) dactyl.open("https://docs.google.com/viewer?url=" + encodeURIComponent(elem.href), dactyl.NEW_TAB), null, ["a[href*='.pdf']", "a[href*='.doc']", "a[href*='.ppt']", "a[href*='.odp']"]);
+EOF
+
+"" display tabgroup title on statusline
+js <<EOF
+overlay.overlayObject(statusline, {
+    updateTabCount: function updateTabCount(delayed) {
+        updateTabCount.superapply(this, arguments);
+        if (!delayed) {
+            let title = "";
+            let groups = services.sessionStore.getWindowValue(window, "tabview-groups");
+            if (groups) {
+                let active = JSON.parse(groups).activeGroupId;
+                let groupData = services.sessionStore.getWindowValue(window, "tabview-group");
+                title = JSON.parse(groupData)[active].title;
+            }
+            if (title) this.widgets.tabcount.value = "(" + title + ")" + this.widgets.tabcount.value;
+        }
+    }
+});
+EOF
+
+"" source boostrap if modified
+command bootstrap :runtime bootstrap
+js <<EOF
+let bootstrapFile = "bootstrap";
+let bootstrapPref = "extensions.dactyl.bootstrapTime";
+let file = io.File(IO.runtimePath + "/" + bootstrapFile);
+if (file.exists() && file.isFile() && file.isReadable()) {
+    let mtime = Math.floor(file.lastModifiedTime / 1000);
+    let btime = prefs.get(bootstrapPref);
+    if (!btime || mtime > btime) {
+        dactyl.execute("runtime " + bootstrapFile);
+        prefs.set(bootstrapPref, Math.floor(Date.now() / 1000));
+    }
+}
+EOF
+
+"" change EX mode prompt
+js <<EOF
+overlay.overlayObject(modes, {
+    _getModeMessage: function _getModeMessage() {
+        return _getModeMessage.superapply(this, arguments).replace(/^-- EX --/, "$ ");
+    }
+});
+EOF
+"" }}}
+
+" vim: set ft=pentadactyl fdm=marker:
