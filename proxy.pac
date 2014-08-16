@@ -42,6 +42,9 @@ function FindProxyForURL(url, host) {
         || dnsDomainIs(host, "nownews.com")
         || dnsDomainIs(host, "nytimes.com")
         || dnsDomainIs(host, "tutsplus.com")
+        || dnsDomainIs(host, "amazonaws.com")
+        || dnsDomainIs(host, "openvpn.net")
+        || dnsDomainIs(host, "slideshare.net")
         //MARK1
        ) {
       return proxy;
@@ -82,6 +85,9 @@ function FindProxyForURL(url, host) {
       || dnsDomainIs(host, "nownews.com")
       || dnsDomainIs(host, "nytimes.com")
       || dnsDomainIs(host, "tutsplus.com")
+      || dnsDomainIs(host, "amazonaws.com")
+      || dnsDomainIs(host, ".openvpn.net")
+      || dnsDomainIs(host, ".slideshare.net")
       //MARK2
      ) {
     return proxy;
