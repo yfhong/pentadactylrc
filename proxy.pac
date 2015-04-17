@@ -20,6 +20,7 @@ function FindProxyForURL(url, host) {
         || dnsDomainIs(host, "googleusercontent.com")
         || dnsDomainIs(host, "googlevideo.com")
         || dnsDomainIs(host, "gstatic.com")
+        || dnsDomainIs(host, "youtu.be")
         || dnsDomainIs(host, "youtube.com")
         || dnsDomainIs(host, "youtube-nocookie.com")
         || dnsDomainIs(host, "ytimg.com")
@@ -45,6 +46,15 @@ function FindProxyForURL(url, host) {
         || dnsDomainIs(host, "amazonaws.com")
         || dnsDomainIs(host, "openvpn.net")
         || dnsDomainIs(host, "slideshare.net")
+        || dnsDomainIs(host, "mobile01.com")
+        || dnsDomainIs(host, "rubyforge.org")
+        || dnsDomainIs(host, "name.com")
+        || dnsDomainIs(host, "instagram.com")
+        || dnsDomainIs(host, "blackberry.com")
+        || dnsDomainIs(host, "twitter.com")
+        || dnsDomainIs(host, "purecss.io")
+        || dnsDomainIs(host, "v2ex.com")
+        || dnsDomainIs(host, "mobile01.com")
         //MARK1
        ) {
       return proxy;
@@ -63,6 +73,7 @@ function FindProxyForURL(url, host) {
       || dnsDomainIs(host, "googleusercontent.com")
       || dnsDomainIs(host, "googlevideo.com")
       || dnsDomainIs(host, "gstatic.com")
+      || dnsDomainIs(host, "youtu.be")
       || dnsDomainIs(host, "youtube.com")
       || dnsDomainIs(host, "youtube-nocookie.com")
       || dnsDomainIs(host, "ytimg.com")
@@ -88,6 +99,16 @@ function FindProxyForURL(url, host) {
       || dnsDomainIs(host, "amazonaws.com")
       || dnsDomainIs(host, ".openvpn.net")
       || dnsDomainIs(host, ".slideshare.net")
+      || dnsDomainIs(host, ".youtube.com")
+      || dnsDomainIs(host, ".mobile01.com")
+      || dnsDomainIs(host, ".rubyforge.org")
+      || dnsDomainIs(host, ".name.com")
+      || dnsDomainIs(host, ".instagram.com")
+      || dnsDomainIs(host, ".blackberry.com")
+      || dnsDomainIs(host, ".twitter.com")
+      || dnsDomainIs(host, ".purecss.io")
+      || dnsDomainIs(host, ".v2ex.com")
+      || dnsDomainIs(host, ".mobile01.com")
       //MARK2
      ) {
     return proxy;
